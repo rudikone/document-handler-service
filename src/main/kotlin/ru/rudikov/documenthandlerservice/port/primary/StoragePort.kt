@@ -15,7 +15,7 @@ interface StoragePort {
 
     fun load(filename: String): Path?
 
-    fun loadAsResource(filename: String): Resource?
+    fun loadAsResource(filename: String): Resource
 
     fun deleteAll()
 }

@@ -16,10 +16,18 @@ repositories {
 }
 
 dependencies {
+	//spring
 	implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
 	implementation("org.springframework.boot:spring-boot-starter-web")
+
+	//kotlin
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+	//openapi
+	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+
+	//test
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
 

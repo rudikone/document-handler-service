@@ -71,7 +71,7 @@ class FileStorageUseCase(
 
     override fun load(filename: String): Path = Paths.get(properties.location).resolve(filename)
 
-    override fun loadAsResource(filename: String): Resource? = runCatching {
+    override fun loadAsResource(filename: String): Resource = runCatching {
         val file: Path = load(filename)
         val resource: Resource = UrlResource(file.toUri())
         if (resource.exists() || resource.isReadable) {
