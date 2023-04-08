@@ -55,9 +55,4 @@ class FileController(
         )
         return "redirect:/"
     }
-
-    @ExceptionHandler(StorageFileNotFoundException::class)
-    fun handleStorageFileNotFound(exc: StorageFileNotFoundException?): ResponseEntity<*>? {
-        return ResponseEntity.notFound().build<Any>()
-    }
 }
