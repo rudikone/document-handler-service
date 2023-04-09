@@ -1,6 +1,7 @@
 package ru.rudikov.documenthandlerservice.application.service
 
 
+import mu.KotlinLogging
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
@@ -17,6 +18,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.stream.Stream
+import kotlin.io.path.absolutePathString
 
 @Service
 class FileStorageUseCase(
@@ -52,6 +54,8 @@ class FileStorageUseCase(
             } else {
                 throw it
             }
+        }.onSuccess {
+            logger.info { "File ${file.originalFilename} was saved" }
         }.getOrThrow()
     }
 
@@ -100,6 +104,12 @@ class FileStorageUseCase(
             } else {
                 throw it
             }
+        }.onSuccess {
+            logger.info { "Directory ${it.absolutePathString()} was created" }
         }.getOrThrow()
+    }
+
+    companion object {
+        private val logger = KotlinLogging.logger {}
     }
 }
