@@ -40,14 +40,10 @@ class FileStorageUseCase(
 
             if (destinationFile.parent != Paths.get(properties.location).toAbsolutePath()) {
                 // This is a security check
-                throw StorageException(
-                    "Cannot store file outside current directory."
-                )
+                throw StorageException("Cannot store file outside current directory.")
             }
 
-            file.inputStream.use { inputStream ->
-                Files.copy(inputStream, destinationFile, REPLACE_EXISTING)
-            }
+            file.inputStream.use { inputStream -> Files.copy(inputStream, destinationFile, REPLACE_EXISTING) }
         }.onFailure {
             if (it is IOException) {
                 throw StorageException("Failed to store file.", it)
@@ -62,9 +58,7 @@ class FileStorageUseCase(
     override fun loadAll(): Stream<Path?>? = runCatching {
         Files.walk(Paths.get(properties.location), 1)
             .filter { path -> path != Paths.get(properties.location) }
-            .map {
-                Paths.get(properties.location).relativize(it)
-            }
+            .map { Paths.get(properties.location).relativize(it) }
     }.onFailure {
         if (it is IOException) {
             throw StorageException("Failed to read stored files", it)
