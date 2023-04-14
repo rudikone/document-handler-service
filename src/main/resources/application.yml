@@ -4,7 +4,17 @@ server:
     context-path: /dhs
 
 spring:
+  application:
+    name: document-handler-service
   servlet:
     multipart:
       max-file-size: 128KB
       max-request-size: 128KB
+
+logging:
+  level:
+    org.apache.tomcat: OFF
+    org.apache.catalina: OFF
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
+    root: INFO
+    ru.rudikov: DEBUG

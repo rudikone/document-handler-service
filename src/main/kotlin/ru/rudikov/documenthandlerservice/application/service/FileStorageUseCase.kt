@@ -1,6 +1,7 @@
 package ru.rudikov.documenthandlerservice.application.service
 
 
+import mu.KotlinLogging
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource
 import org.springframework.stereotype.Service
@@ -17,6 +18,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.StandardCopyOption.REPLACE_EXISTING
 import java.util.stream.Stream
+import kotlin.io.path.absolutePathString
 
 @Service
 class FileStorageUseCase(
@@ -38,29 +40,25 @@ class FileStorageUseCase(
 
             if (destinationFile.parent != Paths.get(properties.location).toAbsolutePath()) {
                 // This is a security check
-                throw StorageException(
-                    "Cannot store file outside current directory."
-                )
+                throw StorageException("Cannot store file outside current directory.")
             }
 
-            file.inputStream.use { inputStream ->
-                Files.copy(inputStream, destinationFile, REPLACE_EXISTING)
-            }
+            file.inputStream.use { inputStream -> Files.copy(inputStream, destinationFile, REPLACE_EXISTING) }
         }.onFailure {
             if (it is IOException) {
                 throw StorageException("Failed to store file.", it)
             } else {
                 throw it
             }
+        }.onSuccess {
+            logger.info { "File ${file.originalFilename} was saved" }
         }.getOrThrow()
     }
 
     override fun loadAll(): Stream<Path?>? = runCatching {
         Files.walk(Paths.get(properties.location), 1)
             .filter { path -> path != Paths.get(properties.location) }
-            .map {
-                Paths.get(properties.location).relativize(it)
-            }
+            .map { Paths.get(properties.location).relativize(it) }
     }.onFailure {
         if (it is IOException) {
             throw StorageException("Failed to read stored files", it)
@@ -100,6 +98,12 @@ class FileStorageUseCase(
             } else {
                 throw it
             }
+        }.onSuccess {
+            logger.info { "Directory ${it.absolutePathString()} was created" }
         }.getOrThrow()
+    }
+
+    companion object {
+        private val logger = KotlinLogging.logger {}
     }
 }
