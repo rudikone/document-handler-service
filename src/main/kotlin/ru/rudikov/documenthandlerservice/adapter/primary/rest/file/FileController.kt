@@ -43,8 +43,11 @@ class FileController(
         ]
     )
     @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun saveFile(@RequestParam("file") file: MultipartFile): ResponseEntity<Unit> {
-        storagePort.store(file)
+    fun saveFile(
+        @RequestParam("file") file: MultipartFile,
+        @RequestParam(name = "type", required = false) type: String?
+    ): ResponseEntity<Unit> {
+        storagePort.save(file = file, type = type)
 
         return ResponseEntity.created(
             ServletUriComponentsBuilder

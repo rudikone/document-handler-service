@@ -9,7 +9,7 @@ interface StoragePort {
 
     fun init()
 
-    fun store(file: MultipartFile)
+    fun save(file: MultipartFile, type: String? = null)
 
     fun loadAll(): Stream<Path?>?
 

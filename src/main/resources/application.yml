@@ -18,3 +18,6 @@ logging:
     org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
     root: INFO
     ru.rudikov: DEBUG
+
+storage:
+  location: documents

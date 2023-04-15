@@ -24,12 +24,16 @@ class MvcFileController(
 
     @GetMapping("/")
     fun listUploadedFiles(model: Model): String? {
-        model.addAttribute("files", storagePort.loadAll()?.map { path ->
-            MvcUriComponentsBuilder.fromMethodName(
-                MvcFileController::class.java,
-                "serveFile", path?.fileName.toString()
-            ).build().toUri().toString()
-        }?.toList())
+        model.addAttribute(
+            "files",
+            storagePort.loadAll()?.map { path ->
+                MvcUriComponentsBuilder.fromMethodName(
+                    MvcFileController::class.java,
+                    "serveFile",
+                    path?.fileName.toString()
+                ).build().toUri().toString()
+            }?.toList()
+        )
         return "uploadForm"
     }
 
@@ -48,7 +52,7 @@ class MvcFileController(
         @RequestParam("file") file: MultipartFile,
         redirectAttributes: RedirectAttributes,
     ): String? {
-        storagePort.store(file)
+        storagePort.save(file)
         redirectAttributes.addFlashAttribute(
             "message",
             "You successfully uploaded " + file.originalFilename + "!"
