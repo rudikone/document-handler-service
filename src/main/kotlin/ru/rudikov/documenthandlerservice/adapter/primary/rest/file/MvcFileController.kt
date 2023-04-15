@@ -48,7 +48,7 @@ class MvcFileController(
         @RequestParam("file") file: MultipartFile,
         redirectAttributes: RedirectAttributes,
     ): String? {
-        storagePort.store(file)
+        storagePort.save(file)
         redirectAttributes.addFlashAttribute(
             "message",
             "You successfully uploaded " + file.originalFilename + "!"

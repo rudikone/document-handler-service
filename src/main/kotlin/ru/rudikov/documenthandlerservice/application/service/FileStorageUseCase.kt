@@ -11,6 +11,7 @@ import ru.rudikov.documenthandlerservice.application.domain.exception.StorageExc
 import ru.rudikov.documenthandlerservice.application.domain.exception.StorageFileNotFoundException
 import ru.rudikov.documenthandlerservice.configuration.StorageProperties
 import ru.rudikov.documenthandlerservice.port.primary.StoragePort
+import java.io.File
 import java.io.IOException
 import java.net.MalformedURLException
 import java.nio.file.Files
@@ -25,24 +26,22 @@ class FileStorageUseCase(
     private val properties: StorageProperties,
 ) : StoragePort {
 
-    override fun store(file: MultipartFile) {
+    override fun save(file: MultipartFile, type: String?) {
         runCatching {
             if (file.isEmpty) {
                 throw StorageException("Failed to store empty file.")
             }
 
             val fileName = file.originalFilename ?: throw StorageException("File not defined or not available")
+            val filePath = type?.let { Paths.get(it + File.separator + fileName) } ?: Paths.get(fileName)
+            val destinationFile: Path = properties.storageLocation.resolve(filePath).normalize().toAbsolutePath()
 
-            val destinationFile: Path = Paths.get(properties.location)
-                .resolve(Paths.get(fileName))
-                .normalize()
-                .toAbsolutePath()
-
-            if (destinationFile.parent != Paths.get(properties.location).toAbsolutePath()) {
+            if (!destinationFile.startsWith(properties.storageLocation.toAbsolutePath())) {
                 // This is a security check
-                throw StorageException("Cannot store file outside current directory.")
+                throw StorageException("Cannot store file outside ${properties.storageLocation}.")
             }
 
+            type?.let { Files.createDirectories(destinationFile.parent) }
             file.inputStream.use { inputStream -> Files.copy(inputStream, destinationFile, REPLACE_EXISTING) }
         }.onFailure {
             if (it is IOException) {
@@ -56,9 +55,9 @@ class FileStorageUseCase(
     }
 
     override fun loadAll(): Stream<Path?>? = runCatching {
-        Files.walk(Paths.get(properties.location), 1)
-            .filter { path -> path != Paths.get(properties.location) }
-            .map { Paths.get(properties.location).relativize(it) }
+        Files.walk(properties.storageLocation, 1)
+            .filter { path -> path != properties.storageLocation }
+            .map { properties.storageLocation.relativize(it) }
     }.onFailure {
         if (it is IOException) {
             throw StorageException("Failed to read stored files", it)
@@ -67,11 +66,12 @@ class FileStorageUseCase(
         }
     }.getOrThrow()
 
-    override fun load(filename: String): Path = Paths.get(properties.location).resolve(filename)
+    override fun load(filename: String): Path = properties.storageLocation.resolve(filename)
 
     override fun loadAsResource(filename: String): Resource = runCatching {
         val file: Path = load(filename)
         val resource: Resource = UrlResource(file.toUri())
+
         if (resource.exists() || resource.isReadable) {
             resource
         } else {
@@ -86,12 +86,12 @@ class FileStorageUseCase(
     }.getOrThrow()
 
     override fun deleteAll() {
-        FileSystemUtils.deleteRecursively(Paths.get(properties.location).toFile())
+        FileSystemUtils.deleteRecursively(properties.storageLocation.toFile())
     }
 
     override fun init() {
         runCatching {
-            Files.createDirectories(Paths.get(properties.location))
+            Files.createDirectories(properties.storageLocation)
         }.onFailure {
             if (it is IOException) {
                 throw StorageException("Could not initialize storage", it)

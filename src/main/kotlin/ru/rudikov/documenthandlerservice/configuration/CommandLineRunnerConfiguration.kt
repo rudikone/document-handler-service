@@ -13,7 +13,6 @@ class CommandLineRunnerConfiguration {
     @Bean
     fun init(storageService: StoragePort): CommandLineRunner? {
         return CommandLineRunner {
-            storageService.deleteAll()
             storageService.init()
         }
     }
