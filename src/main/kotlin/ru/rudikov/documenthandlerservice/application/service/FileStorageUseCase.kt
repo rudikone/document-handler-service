@@ -1,6 +1,5 @@
 package ru.rudikov.documenthandlerservice.application.service
 
-
 import mu.KotlinLogging
 import org.springframework.core.io.Resource
 import org.springframework.core.io.UrlResource

@@ -5,7 +5,6 @@ import mu.KotlinLogging
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
@@ -15,6 +14,7 @@ import org.springframework.web.context.request.WebRequest
 import ru.rudikov.documenthandlerservice.application.domain.exception.StorageException
 import ru.rudikov.documenthandlerservice.application.domain.exception.StorageFileNotFoundException
 
+@Suppress("UnusedPrivateMember")
 @RestControllerAdvice
 class ControllerAdvice {
 

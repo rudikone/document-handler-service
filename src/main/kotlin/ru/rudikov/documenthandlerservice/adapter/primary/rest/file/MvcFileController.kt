@@ -24,12 +24,16 @@ class MvcFileController(
 
     @GetMapping("/")
     fun listUploadedFiles(model: Model): String? {
-        model.addAttribute("files", storagePort.loadAll()?.map { path ->
-            MvcUriComponentsBuilder.fromMethodName(
-                MvcFileController::class.java,
-                "serveFile", path?.fileName.toString()
-            ).build().toUri().toString()
-        }?.toList())
+        model.addAttribute(
+            "files",
+            storagePort.loadAll()?.map { path ->
+                MvcUriComponentsBuilder.fromMethodName(
+                    MvcFileController::class.java,
+                    "serveFile",
+                    path?.fileName.toString()
+                ).build().toUri().toString()
+            }?.toList()
+        )
         return "uploadForm"
     }
 

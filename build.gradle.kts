@@ -3,6 +3,7 @@ plugins {
     id("io.spring.dependency-management") version "1.1.0"
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.spring") version "1.7.22"
+    id("io.gitlab.arturbosch.detekt") version "1.22.0"
 }
 
 group = "ru.rudikov"
@@ -23,12 +24,22 @@ dependencies {
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     implementation("io.github.microutils:kotlin-logging-jvm:3.0.5")
 
+    //detekt
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.22.0")
+
     //openapi
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
 
     //test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
 }
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false
+    autoCorrect = true
+}
+
 
 tasks {
     compileKotlin {

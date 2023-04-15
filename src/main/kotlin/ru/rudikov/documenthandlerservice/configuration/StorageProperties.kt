@@ -14,5 +14,7 @@ class StorageProperties {
 
     private val homeDirectory: String get() = System.getProperty("user.home")
     private val serviceDirectory: String get() = "DocumentHandlerService"
-    val storageLocation: Path get() = Paths.get(homeDirectory + File.separator + serviceDirectory + File.separator + location)
+    val storageLocation: Path get() = Paths.get(
+        homeDirectory + File.separator + serviceDirectory + File.separator + location
+    )
 }
