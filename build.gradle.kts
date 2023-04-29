@@ -4,6 +4,7 @@ plugins {
     kotlin("jvm") version "1.7.22"
     kotlin("plugin.spring") version "1.7.22"
     id("io.gitlab.arturbosch.detekt") version "1.22.0"
+    id("org.cyclonedx.bom") version "1.7.4"
 }
 
 group = "ru.rudikov"
@@ -47,6 +48,22 @@ tasks {
             freeCompilerArgs = listOf("-Xjsr305=strict")
             jvmTarget = "17"
         }
+    }
+
+    cyclonedxBom {
+        setIncludeConfigs(listOf("runtimeClasspath"))
+        setSkipConfigs(listOf("compileClasspath", "testCompileClasspath"))
+        setProjectType("application")
+        setSchemaVersion("1.4")
+        setDestination(project.file("build/reports"))
+        setOutputName("CycloneDX-Sbom")
+        setOutputFormat("all")
+        setIncludeBomSerialNumber(true)
+        setComponentVersion("2.0.0")
+    }
+
+    build {
+        finalizedBy("cyclonedxBom")
     }
 
     test {
