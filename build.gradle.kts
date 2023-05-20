@@ -17,7 +17,6 @@ repositories {
 
 dependencies {
     //spring
-    implementation("org.springframework.boot:spring-boot-starter-thymeleaf")
     implementation("org.springframework.boot:spring-boot-starter-web")
 
     //kotlin
@@ -30,6 +29,9 @@ dependencies {
 
     //openapi
     implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.1.0")
+
+    //db
+    implementation("org.springframework.boot:spring-boot-starter-data-mongodb:3.0.6")
 
     //test
     testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -57,8 +59,9 @@ tasks {
         setSchemaVersion("1.4")
         setDestination(project.file("build/reports"))
         setOutputName("CycloneDX-Sbom")
-        setOutputFormat("all")
-        setIncludeBomSerialNumber(true)
+        setOutputFormat("json")
+        setIncludeBomSerialNumber(false)
+        setIncludeLicenseText(false)
         setComponentVersion("2.0.0")
     }
 

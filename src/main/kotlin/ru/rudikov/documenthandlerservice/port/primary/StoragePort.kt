@@ -2,20 +2,12 @@ package ru.rudikov.documenthandlerservice.port.primary
 
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
-import java.nio.file.Path
-import java.util.stream.Stream
 
 interface StoragePort {
 
-    fun init()
+    fun save(file: MultipartFile, type: String? = null): String
 
-    fun save(file: MultipartFile, type: String? = null)
-
-    fun loadAll(): Stream<Path?>?
-
-    fun load(filename: String): Path?
-
-    fun loadAsResource(filename: String): Resource
+    fun download(filename: String): Resource
 
     fun deleteAll()
 }

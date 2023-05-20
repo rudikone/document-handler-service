@@ -8,8 +8,15 @@ spring:
     name: document-handler-service
   servlet:
     multipart:
-      max-file-size: 128KB
-      max-request-size: 128KB
+      enabled: true
+      max-file-size: 200MB
+      max-request-size: 200MB
+  data:
+    mongodb:
+      port: 27017
+      host: localhost
+      database: documents
+      uri: mongodb+srv://dhs:dhs@cluster0.eypdh.mongodb.net/documents?retryWrites=true&w=majority
 
 logging:
   level:

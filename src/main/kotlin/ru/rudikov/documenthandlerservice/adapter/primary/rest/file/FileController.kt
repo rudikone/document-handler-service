@@ -24,7 +24,7 @@ import ru.rudikov.documenthandlerservice.port.primary.StoragePort
 @RestController
 @RequestMapping("/file")
 class FileController(
-    private val storagePort: StoragePort,
+    private val gridFSUseCase: StoragePort,
 ) {
 
     @Operation(summary = "Сохранить файл")
@@ -47,13 +47,13 @@ class FileController(
         @RequestParam("file") file: MultipartFile,
         @RequestParam(name = "type", required = false) type: String?
     ): ResponseEntity<Unit> {
-        storagePort.save(file = file, type = type)
+        val filename = gridFSUseCase.save(file = file, type = type)
 
         return ResponseEntity.created(
             ServletUriComponentsBuilder
                 .fromCurrentRequest()
                 .path("/{fileName}")
-                .buildAndExpand(file.originalFilename)
+                .buildAndExpand(filename)
                 .toUri()
         ).build()
     }
@@ -81,7 +81,7 @@ class FileController(
     @GetMapping("/{filename:.+}")
     @ResponseBody
     fun getFile(@PathVariable filename: String): ResponseEntity<Resource> {
-        val file: Resource = storagePort.loadAsResource(filename)
+        val file: Resource = gridFSUseCase.download(filename)
         return ResponseEntity.ok().header(
             HttpHeaders.CONTENT_DISPOSITION,
             "attachment; filename=\"" + file.filename + "\""
