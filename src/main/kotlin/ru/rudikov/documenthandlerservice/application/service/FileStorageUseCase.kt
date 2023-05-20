@@ -23,9 +23,9 @@ import kotlin.io.path.absolutePathString
 @Service
 class FileStorageUseCase(
     private val properties: StorageProperties,
-) : StoragePort {
+) : StoragePort, FileStorageService {
 
-    override fun save(file: MultipartFile, type: String?) {
+    override fun save(file: MultipartFile, type: String?): String =
         runCatching {
             if (file.isEmpty) {
                 throw StorageException("Failed to store empty file.")
@@ -42,8 +42,11 @@ class FileStorageUseCase(
 
             type?.let { Files.createDirectories(destinationFile.parent) }
             file.inputStream.use { inputStream -> Files.copy(inputStream, destinationFile, REPLACE_EXISTING) }
+
+            file.originalFilename!!
         }.onFailure {
             if (it is IOException) {
+                logger.error { it }
                 throw StorageException("Failed to store file.", it)
             } else {
                 throw it
@@ -51,24 +54,24 @@ class FileStorageUseCase(
         }.onSuccess {
             logger.info { "File ${file.originalFilename} was saved" }
         }.getOrThrow()
-    }
 
-    override fun loadAll(): Stream<Path?>? = runCatching {
+    override fun getAllPaths(): Stream<Path?>? = runCatching {
         Files.walk(properties.storageLocation, 1)
             .filter { path -> path != properties.storageLocation }
             .map { properties.storageLocation.relativize(it) }
     }.onFailure {
         if (it is IOException) {
+            logger.error { it }
             throw StorageException("Failed to read stored files", it)
         } else {
             throw it
         }
     }.getOrThrow()
 
-    override fun load(filename: String): Path = properties.storageLocation.resolve(filename)
+    override fun getPath(filename: String): Path = properties.storageLocation.resolve(filename)
 
-    override fun loadAsResource(filename: String): Resource = runCatching {
-        val file: Path = load(filename)
+    override fun download(filename: String): Resource = runCatching {
+        val file: Path = getPath(filename)
         val resource: Resource = UrlResource(file.toUri())
 
         if (resource.exists() || resource.isReadable) {
@@ -78,6 +81,7 @@ class FileStorageUseCase(
         }
     }.onFailure {
         if (it is MalformedURLException) {
+            logger.error { it }
             throw StorageFileNotFoundException("Could not read file: $filename", it)
         } else {
             throw it

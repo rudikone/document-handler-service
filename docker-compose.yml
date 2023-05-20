@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  mongodb:
+    image: 'mongo'
+    container_name: 'dhs-mongo'
+    environment:
+      - MONGO_INITDB_DATABASE=documents
+      - MONGO_INITDB_ROOT_USERNAME=dhs
+      - MONGO_INITDB_ROOT_PASSWORD=dhs
+    volumes:
+      - ./src/main/resources/docker/mongo/init-mongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+    ports:
+      - '27017:27017'
