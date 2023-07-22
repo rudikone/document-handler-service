@@ -13,9 +13,13 @@ spring:
       max-request-size: 200MB
   data:
     mongodb:
-      port: 27017
+      authentication-database: admin
+      authentication-mechanism: SCRAM-SHA-1
       host: localhost
+      port: 27017
       database: documents
+      username: dhs
+      password: dhs
 
 logging:
   level:
@@ -24,6 +28,3 @@ logging:
     org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
     root: INFO
     ru.rudikov: DEBUG
-
-storage:
-  location: documents
