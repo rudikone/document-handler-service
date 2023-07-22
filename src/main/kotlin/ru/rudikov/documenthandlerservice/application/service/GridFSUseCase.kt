@@ -2,7 +2,6 @@ package ru.rudikov.documenthandlerservice.application.service
 
 import com.mongodb.BasicDBObject
 import mu.KotlinLogging
-import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.data.mongodb.core.query.Criteria
 import org.springframework.data.mongodb.core.query.Query
@@ -28,9 +27,7 @@ class GridFSUseCase(
 
             val fileName = file.originalFilename ?: throw StorageException("File not defined or not available")
 
-            val metadata = BasicDBObject().apply {
-                this["fileSize"] = file.size
-            }
+            val metadata = BasicDBObject().apply { this["fileSize"] = file.size }
 
             val fileId = template.store(
                 file.inputStream,
@@ -52,7 +49,7 @@ class GridFSUseCase(
             throw StorageFileNotFoundException("Could not read file: $filename")
         }
 
-        ByteArrayResource(operations.getResource(gridFSFile).inputStream.readBytes())
+        operations.getResource(gridFSFile)
     }.onFailure {
         logger.error { it }
         throw StorageFileNotFoundException("Could not read file: $filename", it)

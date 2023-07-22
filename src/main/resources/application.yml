@@ -16,7 +16,6 @@ spring:
       port: 27017
       host: localhost
       database: documents
-      uri: mongodb+srv://dhs:dhs@cluster0.eypdh.mongodb.net/documents?retryWrites=true&w=majority
 
 logging:
   level:
