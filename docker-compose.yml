@@ -4,5 +4,8 @@ services:
   mongodb:
     image: mongo
     restart: always
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=dhs
+      - MONGO_INITDB_ROOT_PASSWORD=dhs
     ports:
       - "27017:27017"
