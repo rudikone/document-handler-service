@@ -14,12 +14,15 @@ spring:
   data:
     mongodb:
       authentication-database: admin
-      authentication-mechanism: SCRAM-SHA-1
       host: localhost
       port: 27017
       database: documents
       username: dhs
       password: dhs
+      options:
+        maxConnectionIdleTime: 60000 # set the maxConnectionIdleTime to 60 seconds
+        connectTimeout: 8000 # Set the connection timeout to 8 seconds
+        socketTimeout: 30000 # Set the socket timeout to 30 seconds
 
 logging:
   level:

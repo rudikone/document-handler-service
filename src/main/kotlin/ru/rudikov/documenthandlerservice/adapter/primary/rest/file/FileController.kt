@@ -9,7 +9,7 @@ import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.Resource
 import org.springframework.data.mongodb.gridfs.GridFsResource
 import org.springframework.http.ContentDisposition
-import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpHeaders.CONTENT_DISPOSITION
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
 import org.springframework.http.MediaType.parseMediaType
 import org.springframework.http.ResponseEntity
@@ -25,7 +25,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import ru.rudikov.documenthandlerservice.adapter.primary.rest.advice.ErrorMessage
 import ru.rudikov.documenthandlerservice.port.primary.StoragePort
 import java.net.URLEncoder
-import java.nio.charset.StandardCharsets
+import java.nio.charset.StandardCharsets.UTF_8
 
 @RestController
 @RequestMapping("/file")
@@ -49,19 +49,11 @@ class FileController(
         ]
     )
     @PostMapping(consumes = [MULTIPART_FORM_DATA_VALUE])
-    fun saveFile(
-        @RequestParam("file") file: MultipartFile,
-        @RequestParam(name = "type", required = false) type: String?
-    ): ResponseEntity<Unit> {
-        val filename = gridFSUseCase.save(file = file, type = type)
+    fun saveFile(@RequestParam("file") file: MultipartFile): ResponseEntity<Unit> {
+        val fileId = gridFSUseCase.save(file = file)
+        val location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(fileId).toUri()
 
-        return ResponseEntity.created(
-            ServletUriComponentsBuilder
-                .fromCurrentRequest()
-                .path("/{fileName}")
-                .buildAndExpand(filename)
-                .toUri()
-        ).build()
+        return ResponseEntity.created(location).build()
     }
 
     @Operation(summary = "Скачать файл")
@@ -69,7 +61,7 @@ class FileController(
         value = [
             ApiResponse(
                 responseCode = "200",
-                description = "Created",
+                description = "OK",
                 content = [Content(mediaType = MULTIPART_FORM_DATA_VALUE)]
             ),
             ApiResponse(
@@ -84,22 +76,18 @@ class FileController(
             ),
         ]
     )
-    @GetMapping("/{filename:.+}")
+    @GetMapping("/{id:.+}")
     @ResponseBody
-    fun getFile(@PathVariable filename: String): ResponseEntity<Resource> {
-        val file = gridFSUseCase.download(filename) as GridFsResource
+    fun download(@PathVariable id: String): ResponseEntity<Resource> {
+        val file = gridFSUseCase.download(id) as GridFsResource
 
-        val encodedFilename = URLEncoder.encode(file.filename, StandardCharsets.UTF_8.toString())
-        val contentDisposition = ContentDisposition.builder("attachment")
-            .filename(encodedFilename)
-            .build()
+        val encodedFilename = URLEncoder.encode(file.filename, UTF_8.toString())
+        val contentDisposition = ContentDisposition.builder("attachment").filename(encodedFilename).build()
+        val response = ByteArrayResource(file.inputStream.readBytes())
 
         return ResponseEntity.ok()
             .contentType(parseMediaType(file.contentType))
-            .header(
-                HttpHeaders.CONTENT_DISPOSITION,
-                contentDisposition.toString()
-            )
-            .body(ByteArrayResource(file.inputStream.readBytes()))
+            .header(CONTENT_DISPOSITION, contentDisposition.toString())
+            .body(response)
     }
 }

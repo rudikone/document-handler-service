@@ -19,21 +19,20 @@ class GridFSUseCase(
     private val operations: GridFsOperations,
 ) : StoragePort {
 
-    override fun save(file: MultipartFile, type: String?): String =
+    override fun save(file: MultipartFile): String =
         runCatching {
             if (file.isEmpty) {
                 throw StorageException("Failed to store empty file.")
             }
 
             val fileName = file.originalFilename ?: throw StorageException("File not defined or not available")
-
             val metadata = BasicDBObject().apply { this["fileSize"] = file.size }
 
             val fileId = template.store(
                 file.inputStream,
                 fileName,
                 file.contentType,
-                metadata
+                metadata,
             )
 
             fileId.toString()
@@ -45,7 +44,7 @@ class GridFSUseCase(
     override fun download(filename: String): Resource = runCatching {
         val gridFSFile = template.findOne(Query(Criteria.where("_id").`is`(filename)))
 
-        if (gridFSFile.equals(null) || gridFSFile.metadata == null) {
+        if (gridFSFile.metadata == null) {
             throw StorageFileNotFoundException("Could not read file: $filename")
         }
 
