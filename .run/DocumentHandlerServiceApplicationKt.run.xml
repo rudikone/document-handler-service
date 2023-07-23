@@ -1,0 +1,12 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DocumentHandlerServiceApplicationKt" type="JetRunConfigurationType" nameIsGenerated="true">
+    <option name="MAIN_CLASS_NAME" value="ru.rudikov.documenthandlerservice.DocumentHandlerServiceApplicationKt" />
+    <module name="document-handler-service.main" />
+    <shortenClasspath name="NONE" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="infrastructure" run_configuration_type="docker-deploy" />
+      <option name="ToolBeforeRunTask" enabled="true" actionId="Tool_External Tools_sleep" />
+    </method>
+  </configuration>
+</component>

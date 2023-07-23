@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.gridfs.GridFsOperations
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.rudikov.documenthandlerservice.application.domain.exception.StorageException
 import ru.rudikov.documenthandlerservice.application.domain.exception.StorageFileNotFoundException
@@ -19,21 +20,20 @@ class GridFSUseCase(
     private val operations: GridFsOperations,
 ) : StoragePort {
 
-    override fun save(file: MultipartFile, type: String?): String =
+    override fun save(file: MultipartFile): String =
         runCatching {
             if (file.isEmpty) {
                 throw StorageException("Failed to store empty file.")
             }
 
             val fileName = file.originalFilename ?: throw StorageException("File not defined or not available")
-
             val metadata = BasicDBObject().apply { this["fileSize"] = file.size }
 
             val fileId = template.store(
                 file.inputStream,
                 fileName,
                 file.contentType,
-                metadata
+                metadata,
             )
 
             fileId.toString()
@@ -45,7 +45,7 @@ class GridFSUseCase(
     override fun download(filename: String): Resource = runCatching {
         val gridFSFile = template.findOne(Query(Criteria.where("_id").`is`(filename)))
 
-        if (gridFSFile.equals(null) || gridFSFile.metadata == null) {
+        if (gridFSFile.metadata == null) {
             throw StorageFileNotFoundException("Could not read file: $filename")
         }
 
@@ -55,8 +55,14 @@ class GridFSUseCase(
         throw StorageFileNotFoundException("Could not read file: $filename", it)
     }.getOrThrow()
 
+    @Transactional
     override fun deleteAll() {
-        TODO("Not yet implemented")
+        runCatching {
+            template.delete(Query())
+            operations.delete(Query())
+        }.onSuccess {
+            logger.info { "All files deleted" }
+        }.getOrThrow()
     }
 
     companion object {
