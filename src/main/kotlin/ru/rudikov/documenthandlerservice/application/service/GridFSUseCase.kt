@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.query.Query
 import org.springframework.data.mongodb.gridfs.GridFsOperations
 import org.springframework.data.mongodb.gridfs.GridFsTemplate
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.rudikov.documenthandlerservice.application.domain.exception.StorageException
 import ru.rudikov.documenthandlerservice.application.domain.exception.StorageFileNotFoundException
@@ -54,8 +55,14 @@ class GridFSUseCase(
         throw StorageFileNotFoundException("Could not read file: $filename", it)
     }.getOrThrow()
 
+    @Transactional
     override fun deleteAll() {
-        TODO("Not yet implemented")
+        runCatching {
+            template.delete(Query())
+            operations.delete(Query())
+        }.onSuccess {
+            logger.info { "All files deleted" }
+        }.getOrThrow()
     }
 
     companion object {

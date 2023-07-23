@@ -9,8 +9,8 @@ services:
       - MONGO_INITDB_ROOT_PASSWORD=dhs
     ports:
       - "27017:27017"
-    volumes:
-      - ./src/main/resources/docker/create-gridfs-db.js:/docker-entrypoint-initdb.d/create-gridfs-db.js:ro
+#    volumes:
+#      - ./src/main/resources/docker/create-gridfs-db.js:/docker-entrypoint-initdb.d/create-gridfs-db.js:ro
     healthcheck:
       test: [ "CMD", "mongo", "--eval", "db.adminCommand('ping')" ]
       interval: 30s

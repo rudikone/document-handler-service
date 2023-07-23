@@ -11,8 +11,10 @@ import org.springframework.data.mongodb.gridfs.GridFsResource
 import org.springframework.http.ContentDisposition
 import org.springframework.http.HttpHeaders.CONTENT_DISPOSITION
 import org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE
+import org.springframework.http.MediaType.TEXT_PLAIN_VALUE
 import org.springframework.http.MediaType.parseMediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -89,5 +91,28 @@ class FileController(
             .contentType(parseMediaType(file.contentType))
             .header(CONTENT_DISPOSITION, contentDisposition.toString())
             .body(response)
+    }
+
+    @Operation(summary = "Удалить все файлы")
+    @ApiResponses(
+        value = [
+            ApiResponse(
+                responseCode = "200",
+                description = "OK",
+                content = [Content(mediaType = TEXT_PLAIN_VALUE)]
+            ),
+            ApiResponse(
+                responseCode = "500",
+                description = "Internal Server Error",
+                content = [Content(schema = Schema(implementation = ErrorMessage::class))]
+            ),
+        ]
+    )
+    @DeleteMapping
+    @ResponseBody
+    fun deleteAll(): ResponseEntity<String> {
+        gridFSUseCase.deleteAll()
+
+        return ResponseEntity.ok("All files deleted")
     }
 }
