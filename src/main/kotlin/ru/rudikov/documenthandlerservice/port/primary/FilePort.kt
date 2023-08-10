@@ -3,7 +3,7 @@ package ru.rudikov.documenthandlerservice.port.primary
 import org.springframework.core.io.Resource
 import org.springframework.web.multipart.MultipartFile
 
-interface StoragePort {
+interface FilePort {
 
     fun save(file: MultipartFile): String
 

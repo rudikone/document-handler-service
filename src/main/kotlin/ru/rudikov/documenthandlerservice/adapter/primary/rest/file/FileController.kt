@@ -25,14 +25,14 @@ import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.multipart.MultipartFile
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder
 import ru.rudikov.documenthandlerservice.adapter.primary.rest.advice.ErrorMessage
-import ru.rudikov.documenthandlerservice.port.primary.StoragePort
+import ru.rudikov.documenthandlerservice.port.primary.FilePort
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets.UTF_8
 
 @RestController
 @RequestMapping("/file")
 class FileController(
-    private val gridFSUseCase: StoragePort,
+    private val gridFSUseCase: FilePort,
 ) {
 
     @Operation(summary = "Сохранить файл")

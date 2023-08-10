@@ -12,13 +12,13 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.multipart.MultipartFile
 import ru.rudikov.documenthandlerservice.application.domain.exception.StorageException
 import ru.rudikov.documenthandlerservice.application.domain.exception.StorageFileNotFoundException
-import ru.rudikov.documenthandlerservice.port.primary.StoragePort
+import ru.rudikov.documenthandlerservice.port.primary.FilePort
 
 @Service
 class GridFSUseCase(
     private val template: GridFsTemplate,
     private val operations: GridFsOperations,
-) : StoragePort {
+) : FilePort {
 
     override fun save(file: MultipartFile): String =
         runCatching {
